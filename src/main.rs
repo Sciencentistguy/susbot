@@ -54,7 +54,7 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content.split(' ').any(|x| SUS_WORDS.contains(&x)) || msg.content.contains("among us") {
             info!("SUS! <among us jingle plays>: author: {}; message: {}", msg.author.name, msg.content);
-            msg.reply_ping(&ctx, APPROPRIATE_RESPONSE).await.expect("Failed to reply to message");
+            msg.reply(&ctx, APPROPRIATE_RESPONSE).await.expect("Failed to reply to message");
         }
     }
 
