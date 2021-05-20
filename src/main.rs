@@ -6,10 +6,26 @@ use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 
+use rand::seq::SliceRandom;
+
 use structopt::StructOpt;
 
 const SUS_WORDS: [&str; 6] = ["sus", "vent", "impostor", "amogus", "amongus", "among us"];
 
+const EMOJIS: [&str; 12] = [
+    "<a:blacksus:844328240147333171>",
+    "<a:bluesus:844328240461774878>",
+    "<a:brownsus:844328240423239725>",
+    "<a:cyansus:844328240130424844>",
+    "<a:greensus:844328240351936573>",
+    "<a:limesus:844328240416161872>",
+    "<a:orangesus:844328240311304192>",
+    "<a:pinksus:844328240378281984>",
+    "<a:purplesus:844328240160309291>",
+    "<a:redsus:844328240285483008>",
+    "<a:whitesus:844328240222699550>",
+    "<a:yellowsus:844328240197664818>",
+];
 const APPROPRIATE_RESPONSE: &str = "<a:blacksus:844328240147333171><a:bluesus:844328240461774878><a:brownsus:844328240423239725><a:cyansus:844328240130424844><a:greensus:844328240351936573><a:limesus:844328240416161872><a:orangesus:844328240311304192><a:pinksus:844328240378281984><a:purplesus:844328240160309291><a:redsus:844328240285483008><a:whitesus:844328240222699550><a:yellowsus:844328240197664818>";
 
 struct Handler;
@@ -62,9 +78,13 @@ impl EventHandler for Handler {
                 "SUS! <among us jingle plays>: author: {}; message: {}",
                 msg.author.name, msg.content
             );
-            msg.reply(&ctx, APPROPRIATE_RESPONSE)
-                .await
-                .expect("Failed to reply to message");
+            let mut rng = rand::rngs::OsRng::default();
+            msg.react(
+                &ctx,
+                serenity::utils::parse_emoji(EMOJIS.choose(&mut rng).unwrap()).unwrap(),
+            )
+            .await
+            .expect("Failed to reply to message");
         }
     }
 
@@ -80,10 +100,7 @@ impl EventHandler for Handler {
 }
 
 #[derive(StructOpt, Debug)]
-#[structopt(
-    name = "susbot",
-    about = "sus"
-)]
+#[structopt(name = "susbot", about = "sus")]
 struct Opt {
     /// Provide the token
     #[structopt(short, long)]
