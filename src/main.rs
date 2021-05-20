@@ -8,10 +8,9 @@ use serenity::prelude::*;
 
 use structopt::StructOpt;
 
-const APPROPRIATE_RESPONSE: &str = "<a:blacksus:844328240147333171><a:bluesus:844328240461774878><a:brownsus:844328240423239725><a:cyansus:844328240130424844><a:greensus:844328240351936573><a:limesus:844328240416161872><a:orangesus:844328240311304192><a:pinksus:844328240378281984><a:purplesus:844328240160309291><a:redsus:844328240285483008><a:whitesus:844328240222699550><a:yellowsus:844328240197664818>";
-
-
 const SUS_WORDS: [&str; 6] = ["sus", "vent", "impostor", "amogus", "amongus", "among us"];
+
+const APPROPRIATE_RESPONSE: &str = "<a:blacksus:844328240147333171><a:bluesus:844328240461774878><a:brownsus:844328240423239725><a:cyansus:844328240130424844><a:greensus:844328240351936573><a:limesus:844328240416161872><a:orangesus:844328240311304192><a:pinksus:844328240378281984><a:purplesus:844328240160309291><a:redsus:844328240285483008><a:whitesus:844328240222699550><a:yellowsus:844328240197664818>";
 
 struct Handler;
 
@@ -52,9 +51,20 @@ async fn main() {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content.split(' ').any(|x| SUS_WORDS.contains(&x)) || msg.content.contains("among us") {
-            info!("SUS! <among us jingle plays>: author: {}; message: {}", msg.author.name, msg.content);
-            msg.reply(&ctx, APPROPRIATE_RESPONSE).await.expect("Failed to reply to message");
+        if msg
+            .content
+            .to_lowercase()
+            .split(' ')
+            .any(|x| SUS_WORDS.contains(&x))
+            || msg.content.contains("among us")
+        {
+            info!(
+                "SUS! <among us jingle plays>: author: {}; message: {}",
+                msg.author.name, msg.content
+            );
+            msg.reply(&ctx, APPROPRIATE_RESPONSE)
+                .await
+                .expect("Failed to reply to message");
         }
     }
 
@@ -71,8 +81,8 @@ impl EventHandler for Handler {
 
 #[derive(StructOpt, Debug)]
 #[structopt(
-    name = "bonkbot",
-    about = "A small silly bot to \"bonk\" people in discord"
+    name = "susbot",
+    about = "sus"
 )]
 struct Opt {
     /// Provide the token
