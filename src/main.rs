@@ -21,6 +21,9 @@ const SUS_WORDS: [&str; 8] = [
     "vent",
 ];
 
+// This is my bot's user ID. If you're someone else using this, you will have to change this
+const BOT_MENTION_STR: &str = "<@!844330118364790815>";
+
 const EMOJIS: [&str; 12] = [
     "<a:blacksus:844328240147333171>",
     "<a:bluesus:844328240461774878>",
@@ -75,12 +78,12 @@ async fn main() {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg
-            .content
+        let content = strip_md_chars(msg.content.to_lowercase().as_str());
+        if content
             .to_lowercase()
             .split(' ')
             .any(|x| SUS_WORDS.contains(&x))
-            || msg.content.contains("among us")
+            || content.contains("among us")
         {
             info!(
                 "SUS! <among us jingle plays>: author: {}; message: {}",
@@ -93,7 +96,7 @@ impl EventHandler for Handler {
             )
             .await
             .expect("Failed to react to message");
-        } else if msg.content.contains(ctx.shard_id.to_string().as_str()) {
+        } else if msg.content.contains(BOT_MENTION_STR) {
             msg.react(&ctx, '👀')
                 .await
                 .expect("Failed to react to message");
@@ -119,4 +122,15 @@ struct Opt {
     /// Provide the name of a file containing the token
     #[structopt(short = "f", long)]
     token_filename: Option<String>,
+}
+
+fn strip_md_chars(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '*' | '_' | '~' | '|' | '`' => {}
+            c => out.push(c),
+        }
+    }
+    out
 }
