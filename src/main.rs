@@ -92,10 +92,13 @@ impl EventHandler for Handler {
                 serenity::utils::parse_emoji(EMOJIS.choose(&mut rng).unwrap()).unwrap(),
             )
             .await
-            .expect("Failed to reply to message");
+            .expect("Failed to react to message");
+        } else if msg.content.contains(ctx.shard_id.to_string().as_str()) {
+            msg.react(&ctx, '👀')
+                .await
+                .expect("Failed to react to message");
         }
     }
-
     // Set a handler to be called on the `ready` event. This is called when a
     // shard is booted, and a READY payload is sent by Discord. This payload
     // contains data like the current user's guild Ids, current user data,
