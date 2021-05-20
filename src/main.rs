@@ -10,7 +10,16 @@ use rand::seq::SliceRandom;
 
 use structopt::StructOpt;
 
-const SUS_WORDS: [&str; 6] = ["sus", "vent", "impostor", "amogus", "amongus", "among us"];
+const SUS_WORDS: [&str; 8] = [
+    "amogus",
+    "among us",
+    "amongus",
+    "impostor",
+    "sus",
+    "suspicious",
+    "sussy",
+    "vent",
+];
 
 const EMOJIS: [&str; 12] = [
     "<a:blacksus:844328240147333171>",
@@ -26,7 +35,6 @@ const EMOJIS: [&str; 12] = [
     "<a:whitesus:844328240222699550>",
     "<a:yellowsus:844328240197664818>",
 ];
-const APPROPRIATE_RESPONSE: &str = "<a:blacksus:844328240147333171><a:bluesus:844328240461774878><a:brownsus:844328240423239725><a:cyansus:844328240130424844><a:greensus:844328240351936573><a:limesus:844328240416161872><a:orangesus:844328240311304192><a:pinksus:844328240378281984><a:purplesus:844328240160309291><a:redsus:844328240285483008><a:whitesus:844328240222699550><a:yellowsus:844328240197664818>";
 
 struct Handler;
 
