@@ -10,11 +10,12 @@ use rand::seq::SliceRandom;
 
 use structopt::StructOpt;
 
-const SUS_WORDS: [&str; 8] = [
+const SUS_WORDS: [&str; 9] = [
     "amogus",
     "among us",
     "amongus",
     "impostor",
+    "impostors",
     "sus",
     "suspicious",
     "sussy",
@@ -79,23 +80,21 @@ async fn main() {
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         let content = strip_md_chars(msg.content.to_lowercase().as_str());
-        if content
-            .to_lowercase()
-            .split(' ')
-            .any(|x| SUS_WORDS.contains(&x))
-            || content.contains("among us")
-        {
+        if content.split(' ').any(|x| SUS_WORDS.contains(&x)) || content.contains("among us") {
+            let mut num = 0;
+            for word in SUS_WORDS.iter() {
+                num += content.split(' ').filter(|x| x == word).count();
+            }
             info!(
-                "SUS! <among us jingle plays>: author: {}; message: {}",
-                msg.author.name, msg.content
+                "SUS: author: {}; message: {}; sus count: {}",
+                msg.author.name, msg.content, num
             );
             let mut rng = rand::rngs::OsRng::default();
-            msg.react(
-                &ctx,
-                serenity::utils::parse_emoji(EMOJIS.choose(&mut rng).unwrap()).unwrap(),
-            )
-            .await
-            .expect("Failed to react to message");
+            for emoji in EMOJIS.choose_multiple(&mut rng, num) {
+                msg.react(&ctx, serenity::utils::parse_emoji(emoji).unwrap())
+                    .await
+                    .expect("Failed to react to message");
+            }
         } else if msg.content.contains(BOT_MENTION_STR) {
             msg.react(&ctx, '👀')
                 .await
