@@ -127,7 +127,8 @@ fn strip_md_chars(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
         match c {
-            '*' | '_' | '~' | '|' | '`' => {}
+            '*' | '_' | '~' | '|' | '`' | '.' | '?' | '"' | '‘' | ',' | '-' | '—' | '!' | ':'
+            | ';' | '(' | ')' | '[' | ']' | '…' | '/' | '{' | '}' => {}
             c => out.push(c),
         }
     }
