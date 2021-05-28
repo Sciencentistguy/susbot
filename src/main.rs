@@ -80,13 +80,25 @@ async fn main() {
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         let content = strip_md_chars(msg.content.to_lowercase().as_str());
-        if content.split(' ').any(|x| SUS_WORDS.contains(&x)) || content.contains("among us") {
+        if content.contains("among us") {
+            let mut rng = rand::rngs::OsRng::default();
+            msg.react(
+                &ctx,
+                serenity::utils::parse_emoji(EMOJIS.choose(&mut rng).unwrap()).unwrap(),
+            )
+            .await
+            .expect("Failed to react to message");
+        } else if msg.content.contains(BOT_MENTION_STR) {
+            msg.react(&ctx, '👀')
+                .await
+                .expect("Failed to react to message");
+        } else if content.split(' ').any(|x| SUS_WORDS.contains(&x)) {
             let mut num = 0;
             for word in SUS_WORDS.iter() {
                 num += content.split(' ').filter(|x| x == word).count();
             }
             info!(
-                "SUS: author: {}; message: {}; sus count: {}",
+                "Sus! author: {}; message: {}; sus count: {}",
                 msg.author.name, msg.content, num
             );
             let mut rng = rand::rngs::OsRng::default();
@@ -95,10 +107,6 @@ impl EventHandler for Handler {
                     .await
                     .expect("Failed to react to message");
             }
-        } else if msg.content.contains(BOT_MENTION_STR) {
-            msg.react(&ctx, '👀')
-                .await
-                .expect("Failed to react to message");
         }
     }
     // Set a handler to be called on the `ready` event. This is called when a
