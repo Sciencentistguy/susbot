@@ -81,6 +81,7 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         let content = strip_md_chars(msg.content.to_lowercase().as_str());
         if content.contains("among us") {
+            info!("Sus! author: {}; message: {}", msg.author.name, msg.content);
             let mut rng = rand::rngs::OsRng::default();
             msg.react(
                 &ctx,
@@ -89,6 +90,10 @@ impl EventHandler for Handler {
             .await
             .expect("Failed to react to message");
         } else if msg.content.contains(BOT_MENTION_STR) {
+            info!(
+                "I was tagged. author: {}; message: {}",
+                msg.author.name, msg.content
+            );
             msg.react(&ctx, '👀')
                 .await
                 .expect("Failed to react to message");
