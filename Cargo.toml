@@ -1,6 +1,6 @@
 [package]
 name = "susbot"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Jamie Quigley <jamie@quigley.xyz>"]
 edition = "2018"
 
