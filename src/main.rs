@@ -1,6 +1,6 @@
 use log::*;
 use once_cell::sync::Lazy;
-use std::env;
+use std::path::PathBuf;
 
 use serenity::async_trait;
 use serenity::model::channel::Message;
@@ -9,9 +9,9 @@ use serenity::prelude::*;
 
 use rand::seq::SliceRandom;
 
-use structopt::StructOpt;
+use clap::Parser;
 
-const SUS_WORDS: [&str; 9] = [
+const SUS_WORDS: &[&str] = &[
     "amogus",
     "among us",
     "amongus",
@@ -36,16 +36,10 @@ async fn main() {
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "susbot=info");
     }
+
     pretty_env_logger::init();
-    let opts = Opt::from_args();
-    let token = if opts.token.is_some() {
-        opts.token.unwrap()
-    } else if opts.token_filename.is_some() {
-        std::fs::read_to_string(opts.token_filename.unwrap()).expect("File does not exist")
-    } else {
-        env::var("DISCORD_TOKEN")
-            .expect("Expected either --token, --token-filename, or a token in the environment")
-    };
+    let opts = Opt::parse();
+    let token = std::fs::read_to_string(opts.token_filename).expect("Failed to read token file");
 
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
@@ -113,15 +107,16 @@ impl EventHandler for Handler {
     }
 }
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "susbot", about = "sus")]
+/// sus
+#[derive(Parser, Debug)]
+#[clap(name = "susbot", version, author, about)]
 struct Opt {
-    /// Provide the token
-    #[structopt(short, long)]
-    token: Option<String>,
-    /// Provide the name of a file containing the token
-    #[structopt(short = "f", long)]
-    token_filename: Option<String>,
+    /// File containing the bot token
+    token_filename: PathBuf,
+    /*
+     * /// File containing the application id
+     * application_id_filename: PathBuf,
+     */
 }
 
 fn strip_md_chars(s: &str) -> String {
