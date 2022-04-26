@@ -8,9 +8,9 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 
 use clap::Parser;
+use emojis::EMOJIS;
 use rand::seq::SliceRandom;
 use tracing::*;
-use emojis::EMOJIS;
 
 const SUS_WORDS: &[&str] = &[
     "amogus",
@@ -40,11 +40,24 @@ async fn main() {
 
     let token = std::fs::read_to_string(opts.token_filename).expect("Failed to read token file");
 
+    let appid = std::fs::read_to_string(opts.application_id_filename)
+        .expect("File does not exist")
+        .trim()
+        .parse::<u64>()
+        .unwrap();
+
+    let intents = GatewayIntents::GUILD_MESSAGE_REACTIONS
+        | GatewayIntents::MESSAGE_CONTENT
+        | GatewayIntents::GUILD_MESSAGES;
+
+    assert!(intents.message_content());
+
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
-    let mut client = Client::builder(&token)
+    let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
+        .application_id(appid)
         .await
         .expect("Err creating client");
 
@@ -109,10 +122,8 @@ impl EventHandler for Handler {
 struct Opt {
     /// File containing the bot token
     token_filename: PathBuf,
-    /*
-     * /// File containing the application id
-     * application_id_filename: PathBuf,
-     */
+    /// File containing the application id
+    application_id_filename: PathBuf,
 }
 
 fn strip_md_chars(s: &str) -> String {
