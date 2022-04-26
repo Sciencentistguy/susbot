@@ -32,6 +32,7 @@
             pkg-config
             rustPlatform.bindgenHook
             clippy
+            rustfmt
           ];
           buildInputs = with pkgs; [openssl];
           RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
