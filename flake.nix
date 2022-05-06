@@ -16,7 +16,7 @@
   }:
     {
       overlay = final: prev: {
-        bonkbot = self.packages.${prev.system}.default;
+        susbot = self.packages.${prev.system}.default;
       };
     }
     // flake-utils.lib.eachDefaultSystem (
