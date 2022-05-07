@@ -23,20 +23,38 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs) lib;
+        susbot = {
+          rustPlatform,
+          pkg-config,
+          openssl,
+        }:
+          rustPlatform.buildRustPackage {
+            name = "susbot";
+            src = lib.cleanSource ./.;
+            cargoLock.lockFile = ./Cargo.lock;
+            nativeBuildInputs = [
+              pkg-config
+              rustPlatform.bindgenHook
+            ];
+            buildInputs = [openssl];
+            meta = with lib; {
+              license = licenses.mpl20;
+              homepage = "https://github.com/Sciencentistguy/susbot";
+              platforms = platforms.all;
+            };
+          };
       in {
-        packages.default = pkgs.rustPlatform.buildRustPackage {
-          name = "susbot";
-          src = lib.cleanSource ./.;
-          cargoLock.lockFile = ./Cargo.lock;
-          nativeBuildInputs = with pkgs; [
-            pkg-config
-            rustPlatform.bindgenHook
-            clippy
-            rustfmt
-          ];
-          buildInputs = with pkgs; [openssl];
+        packages.default = pkgs.callPackage susbot {};
+        devShells.default = self.packages.${system}.default.overrideAttrs (super: {
+          nativeBuildInputs = with pkgs;
+            super.nativeBuildInputs
+            ++ [
+              cargo-edit
+              clippy
+              rustfmt
+            ];
           RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
-        };
+        });
       }
     );
 }
