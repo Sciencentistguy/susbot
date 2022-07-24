@@ -44,7 +44,10 @@
             };
           };
       in {
-        packages.default = pkgs.callPackage susbot {};
+        packages.susbot = pkgs.callPackage susbot {};
+
+        packages.default = self.packages.${system}.susbot;
+
         devShells.default = self.packages.${system}.default.overrideAttrs (super: {
           nativeBuildInputs = with pkgs;
             super.nativeBuildInputs
