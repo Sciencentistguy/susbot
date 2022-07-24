@@ -32,7 +32,6 @@ struct Handler;
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
-        .pretty()
         .with_max_level(Level::INFO)
         .init();
 
