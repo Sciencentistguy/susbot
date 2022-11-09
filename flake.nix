@@ -1,21 +1,19 @@
 {
   inputs = {
-    # github example, also supported gitlab:
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    flake-compat = {
-      url = github:edolstra/flake-compat;
-      flake = false;
-    };
+    crane.url = "github:ipetkov/crane";
+    crane.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = {
     self,
     nixpkgs,
     flake-utils,
+    crane,
     ...
   }:
     {
-      overlay = final: prev: {
+      overlays.default = final: prev: {
         susbot = self.packages.${prev.system}.default;
       };
     }
@@ -23,28 +21,18 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs) lib;
-        susbot = {
-          rustPlatform,
-          pkg-config,
-          openssl,
-        }:
-          rustPlatform.buildRustPackage {
-            name = "susbot";
-            src = lib.cleanSource ./.;
-            cargoLock.lockFile = ./Cargo.lock;
-            nativeBuildInputs = [
-              pkg-config
-              rustPlatform.bindgenHook
-            ];
-            buildInputs = [openssl];
-            meta = with lib; {
-              license = licenses.mpl20;
-              homepage = "https://github.com/Sciencentistguy/susbot";
-              platforms = platforms.all;
-            };
-          };
+        craneLib = crane.lib.${system};
+        susbot = craneLib.buildPackage {
+          name = "susbot";
+          src = craneLib.cleanCargoSource ./.;
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            rustPlatform.bindgenHook
+          ];
+          buildInputs = with pkgs; [openssl];
+        };
       in {
-        packages.susbot = pkgs.callPackage susbot {};
+        packages.susbot = susbot;
 
         packages.default = self.packages.${system}.susbot;
 
@@ -55,6 +43,7 @@
               cargo-edit
               clippy
               rustfmt
+              rustc
             ];
           RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
         });
